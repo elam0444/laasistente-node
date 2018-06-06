@@ -1,0 +1,56 @@
+module.js:328
+    throw err;
+    ^
+
+Error: Cannot find module '/home/ubuntu/mulu-bot/test.js'
+    at Function.Module._resolveFilename (module.js:326:15)
+    at Function.Module._load (module.js:277:25)
+    at Function.Module.runMain (module.js:442:10)
+    at startup (node.js:136:18)
+    at node.js:966:3
+{ mid: 'mid.$cAAEoKSNYhVlpb8OGHFjPn485rBQ5',
+  seq: 58722,
+  text: 'Test',
+  nlp: { entities: {} } }
+{ mid: 'mid.$cAAEoKSNYhVlpb8OSc1jPn5J6d3Lu',
+  seq: 58723,
+  text: 'Poll',
+  nlp: { entities: {} } }
+{ mid: 'mid.$cAAEoKSNYhVlpb8PY-VjPn6PhQD3I',
+  seq: 58724,
+  text: 'ECHO this',
+  nlp: { entities: {} } }
+TypeError: Cannot read property '0' of undefined
+    at /home/ubuntu/mulu-bot/index.js:115:42
+    at Array.forEach (native)
+    at /home/ubuntu/mulu-bot/index.js:111:16
+    at Layer.handle [as handle_request] (/home/ubuntu/mulu-bot/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/ubuntu/mulu-bot/node_modules/express/lib/router/route.js:137:13)
+    at Route.dispatch (/home/ubuntu/mulu-bot/node_modules/express/lib/router/route.js:112:3)
+    at Layer.handle [as handle_request] (/home/ubuntu/mulu-bot/node_modules/express/lib/router/layer.js:95:5)
+    at /home/ubuntu/mulu-bot/node_modules/express/lib/router/index.js:281:22
+    at Function.process_params (/home/ubuntu/mulu-bot/node_modules/express/lib/router/index.js:335:12)
+    at next (/home/ubuntu/mulu-bot/node_modules/express/lib/router/index.js:275:10)
+TypeError: Cannot read property '0' of undefined
+    at /home/ubuntu/mulu-bot/index.js:115:42
+    at Array.forEach (native)
+    at /home/ubuntu/mulu-bot/index.js:111:16
+    at Layer.handle [as handle_request] (/home/ubuntu/mulu-bot/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/ubuntu/mulu-bot/node_modules/express/lib/router/route.js:137:13)
+    at Route.dispatch (/home/ubuntu/mulu-bot/node_modules/express/lib/router/route.js:112:3)
+    at Layer.handle [as handle_request] (/home/ubuntu/mulu-bot/node_modules/express/lib/router/layer.js:95:5)
+    at /home/ubuntu/mulu-bot/node_modules/express/lib/router/index.js:281:22
+    at Function.process_params (/home/ubuntu/mulu-bot/node_modules/express/lib/router/index.js:335:12)
+    at next (/home/ubuntu/mulu-bot/node_modules/express/lib/router/index.js:275:10)
+{ mid: 'mid.$cAAEoKSNYhVlpebdc61jSHISwdWOG',
+  seq: 58754,
+  text: 'ECHO this',
+  nlp: { entities: {} } }
+{ mid: 'mid.$cAAEoKSNYhVlpe-PejljSp6VVNeps',
+  seq: 58763,
+  text: 'ECHO this is a test for echoing whatever I type this shows how the input/output works with the FB messenger API',
+  nlp: { entities: {} } }
+{ mid: 'mid.$cAAEoKSNYhVlpe-TNJVjSp-EsiW-1',
+  seq: 58766,
+  text: 'ECHO poll',
+  nlp: { entities: {} } }
