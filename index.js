@@ -19,6 +19,7 @@ var client = redis.createClient();
 var flatten = require('flat');
 var unflatten = require('flat').unflatten;
 
+
 client.on('connect', function () {
     console.log('Redis client connected');
 });
@@ -76,15 +77,25 @@ let matchSenderId;
 let state = -99;
 let quickReplies = [];
 
+
+
 var app = express();
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 3000));
 
+// PUBLIC serves this /public/myfile.ext
+app.use('/public', express.static(__dirname + '/public'));
+
 // Server frontpage
 app.get('/', function (req, res) {
     res.send('TestBot Server is Running');
+});
+
+// TEST
+app.get('/.well-known/acme-challenge/B76ysNakp4NFD5qbHm5FBVUK5lFsS6qRV3wVKLxo2zM', function (req, res) {
+    res.send('B76ysNakp4NFD5qbHm5FBVUK5lFsS6qRV3wVKLxo2zM');
 });
 
 // HEALTH CHECK FOR LOAD BALANCER AWS
