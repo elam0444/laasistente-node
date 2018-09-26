@@ -39,14 +39,6 @@ const https = require('https');
 const apiUrl = process.env.API_URL;
 //const apiUrl = 'http://172.28.128.3:8080/api/';
 
-//CERTIFICATES HTTPS
-var fs = require("fs");
-var options = {
-    ca: fs.readFileSync('ca_bundle.crt'),
-    key: fs.readFileSync('private.key'),
-    cert: fs.readFileSync('certificate.crt')
-};
-
 const month_names = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 ];
@@ -87,15 +79,22 @@ let quickReplies = [];
 
 var app = express();
 
-
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-// app.listen((process.env.PORT || 3000));
+//app.listen((process.env.PORT || 3000));
 // REMOVE IF //CERTIFICATES HTTPS DOES NOT EXIST
-https.createServer(options, app).listen(3000);
 
 // PUBLIC serves this /public/myfile.ext
 app.use('/public', express.static(__dirname + '/public'));
+
+//CERTIFICATES HTTPS
+var fs = require("fs");
+var options = {
+    ca: fs.readFileSync('ca_bundle.crt'),
+    key: fs.readFileSync('private.key'),
+    cert: fs.readFileSync('certificate.crt')
+};
+https.createServer(options, app).listen((process.env.PORT || 3000));
 
 // Server frontpage
 app.get('/', function (req, res) {
