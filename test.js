@@ -175,7 +175,7 @@ function analyzeMessage(webhook_event) { console.log(pendingQuestion);
     // QUICK REPLIES
     if (intent.quick_reply) {
 
-        if (pendingQuestion = -999) {
+        if (pendingQuestion === -999) {
             if (intent.quick_reply.payload === 'START_QUESTIONS') {
                 pendingQuestion = 0;
                 message = {
@@ -225,21 +225,64 @@ function analyzeMessage(webhook_event) { console.log(pendingQuestion);
                     },
                     {
                         "content_type": "text",
-                        "title": "Servicio especializado, profesional",
+                        "title": "Otro/Especializado",
                         "payload": "PROFESSIONAL",
                     },
                 ]
             };
         }
 
-        //if (pendingQuestion === -2) {console.log('here 2');
-        if (intent.quick_reply.payload === 'DELIVERY' || intent.quick_reply.payload === 'CLEANING' || intent.quick_reply.payload === 'PROFESSIONAL') {
-            pendingQuestion = -3;
-            message = {
-                "text": "A que domicilio o dirección necesitas el servicio?"
-            };
+        if (pendingQuestion === -2) {console.log('here 2');
+            if (intent.quick_reply.payload === 'DELIVERY' ||
+                intent.quick_reply.payload === 'CLEANING' ||
+                intent.quick_reply.payload === 'PROFESSIONAL') {
+                pendingQuestion = -3;
+                message = {
+                    "text": "A que domicilio o dirección necesitas el servicio?"
+                };
+            } else {
+
+            }
         }
-        //}
+
+        if (pendingQuestion === -4) {
+            if (intent.quick_reply.payload === 'PRIORITY_NOW' ||
+                intent.quick_reply.payload === 'PRIORITY_48' ||
+                intent.quick_reply.payload === 'PRIORITY_72' ||
+                intent.quick_reply.payload === 'PRIORITY_2W') {
+                pendingQuestion = -5;
+                message = {
+                    "text": "Podrías describirme especificamente los detalles de tu solicitud?"
+                };
+            } else {
+                message = {
+                    "text": "Por favor dinos la prioridad para esta tarea",
+                    "quick_replies": [
+                        {
+                            "content_type": "text",
+                            "title": "Inmediata",
+                            "payload": "PRIORITY_NOW",
+                        },
+                        {
+                            "content_type": "text",
+                            "title": "Hasta 48 horas",
+                            "payload": "PRIORITY_48",
+                        },
+                        {
+                            "content_type": "text",
+                            "title": "Hasta 72 horas",
+                            "payload": "PRIORITY_72",
+                        },
+                        {
+                            "content_type": "text",
+                            "title": "Menos de 15 días",
+                            "payload": "PRIORITY_2W",
+                        },
+                    ]
+                };
+            }
+
+        }
 
     }
 
@@ -247,7 +290,7 @@ function analyzeMessage(webhook_event) { console.log(pendingQuestion);
     if (intent && intent.text && !intent.quick_reply) {
         //console.log(intent.text);
 
-        if (intent.text.includes("EMPEZAR_REGISTRO")) {
+        if (intent.text.includes("REG")) {
             initUser(senderId);
         }
 
@@ -294,37 +337,58 @@ function analyzeMessage(webhook_event) { console.log(pendingQuestion);
             pendingQuestion = -4;
             user.address = intent.text;
             message = {
-                "text": "Cuál es el tiempo de entrega máximo para esta solicitud?"
+                "text": "Cuál es la prioridad para esta solicitud?",
+                "quick_replies": [
+                    {
+                        "content_type": "text",
+                        "title": "Inmediata",
+                        "payload": "PRIORITY_NOW",
+                    },
+                    {
+                        "content_type": "text",
+                        "title": "Hasta 48 horas",
+                        "payload": "PRIORITY_48",
+                    },
+                    {
+                        "content_type": "text",
+                        "title": "Hasta 72 horas",
+                        "payload": "PRIORITY_72",
+                    },
+                    {
+                        "content_type": "text",
+                        "title": "Menos de 15 días",
+                        "payload": "PRIORITY_2W",
+                    },
+                ]
             };
 
-        } else if (pendingQuestion === -4) {
+            /*} else if (pendingQuestion === -4) {
 
-            if (true) {
-                pendingQuestion = -5;
-                user.time = intent.text;
-                message = {
-                    "text": "Podrías describirme especificamente los detalles de tu solicitud?"
-                };
-            } else {
-                message = {
-                    "text": "Por favor dinos en cuanto tiempo esperas resuelta esta tarea"
-                };
-            }
-
+             if (true) {
+             pendingQuestion = -5;
+             user.time = intent.text;
+             message = {
+             "text": "Podrías describirme especificamente los detalles de tu solicitud?"
+             };
+             } else {
+             message = {
+             "text": "Por favor dinos en cuanto tiempo esperas resuelta esta tarea"
+             };
+             }
+             */
         } else if (pendingQuestion === -5) {
 
             pendingQuestion = -1;
             user.description = intent.text;
             message = {
-                "text": "Listo! Estamos agendando tu solicitud, en unos minutos un agente te llamará!"
+                "text": "Listo! Estamos agendando tu solicitud, en unos minutos un agente te contactará!"
             };
 
-        } else {
-            createTask(senderId);
-        }
+        } /*else {
+         createTask(senderId);
+         }*/
     }
 
-    //console.log(user);
     //SEND MESSAGE
     if (message) {
         sendMessage(senderId, message);
@@ -354,6 +418,11 @@ function createTask(senderId) {
                 "title":"NUEVA TAREA",
                 "payload":"READY",
                 // "image_url":"https://s4.aconvert.com/convert/p3r68-cdx67/cb7is-liukh.png"
+            },
+            {
+                "content_type":"text",
+                "title":"TAREAS EN CURSO",
+                "payload":"PENDING"
             }
         ]
     };
