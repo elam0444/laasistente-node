@@ -32,6 +32,7 @@ client.on('error', function (err) {
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
+var path = require('path');
 
 // FOR CONNECTING TO AN API
 const querystring = require('querystring');
@@ -90,9 +91,9 @@ app.use('/public', express.static(__dirname + '/public'));
 //CERTIFICATES HTTPS
 var fs = require("fs");
 var options = {
-    ca: fs.readFileSync('ca_bundle.crt'),
-    key: fs.readFileSync('private.key'),
-    cert: fs.readFileSync('certificate.crt')
+    ca: fs.readFileSync(path.join(__dirname, 'ssl', 'ca_bundle.crt')),
+    key: fs.readFileSync(path.join(__dirname, 'ssl', 'private.key')),
+    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'certificate.crt'))
 };
 https.createServer(options, app).listen((process.env.PORT || 3000));
 
