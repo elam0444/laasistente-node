@@ -86,12 +86,13 @@ let state = -99;
 let quickReplies = [];
 
 var app = express();
-// REMOVE IF //CERTIFICATES HTTPS DOES NOT EXIST
-https.createServer(options, app).listen(8080);
+
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-app.listen((process.env.PORT || 3000));
+// app.listen((process.env.PORT || 3000));
+// REMOVE IF //CERTIFICATES HTTPS DOES NOT EXIST
+https.createServer(options, app).listen(3000);
 
 // PUBLIC serves this /public/myfile.ext
 app.use('/public', express.static(__dirname + '/public'));
