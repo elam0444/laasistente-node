@@ -525,7 +525,7 @@ function analyzeMessage(webhook_event) {
             } else if (state === -1) {
 
                 //searchTravelPal(senderId);
-                createTask();
+                createTask(senderId);
 
             } else if (state === 0) {
 
