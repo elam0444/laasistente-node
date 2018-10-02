@@ -56,10 +56,10 @@ let user = {
     mulu_user_id: '',
     where: '',
     place_id: '',
-    email: '',
-    phone: '',
-    address: '',
+    when: '',
+    birth_year: 0,
     preference: '',
+    email: '',
     token: ''
 };
 
@@ -239,7 +239,6 @@ function main(webhook_event) {
     if (webhook_event.postback && webhook_event.postback.payload === 'GETTING_STARTED') {
         initUser(webhook_event.sender.id);
     } else {
-
         // THERE'S A MESSAGE SENT
         if (webhook_event.message && webhook_event.message.text) {
             analyzeMessage(webhook_event);
@@ -255,20 +254,16 @@ function main(webhook_event) {
 
 function askQuestions(user) {
     sendMessage(user.id, {
-        "text": "Hola " + user.first_name + "!, yo soy LaAsistente. Me encargaré de ayudarte a resolver cualquier tarea"
-    });
-
-    sendMessage(user.id, {
-        "text": "Ej: Enviarte un mensajero para realizar encomiendas, programarte a alguien para asear tu casa/oficina, ayudarte con tu carga laboral, ayudarte a solucionar tu declaración de renta, agendar una cita, enviar un regalo de cumpleaños, o lo que se te ocurra. ",
+        "text": "Welcome " + user.first_name + "!,  Let's find a fellow event goer to share experiences with, split expenses & access discounts",
         "quick_replies": [
             {
                 "content_type": "text",
-                "title": "OK! Empecemos",
+                "title": "OK, Let's do it",
                 "payload": "START_QUESTIONS",
             },
             {
                 "content_type": "text",
-                "title": "Cancelar",
+                "title": "Cancel",
                 "payload": "CANCEL_QUESTIONS",
             },
         ]
@@ -370,7 +365,7 @@ function analyzePayload(webhook_event) {
 }
 
 // Analyze message
-function analyzeMessage(webhook_event) {
+function analyzeMessage(webhook_event) { console.log(state);
 
     client.hgetall("user:" + webhook_event.sender.id, function (error, result) {
         let stored = unflatten(result);
@@ -384,13 +379,13 @@ function analyzeMessage(webhook_event) {
             if (intent.quick_reply.payload === 'START_QUESTIONS') {
                 stored.state = 0;
                 message = {
-                    "text": "¿Cuál es tu email? Ex. hola@correo.com"
+                    "text": "What event do you want to attend? Ex. Coachella, Comic con"
                 };
             }
 
             if (intent.quick_reply.payload === 'CANCEL_QUESTIONS') {
                 message = {
-                    "text": "Recuerda que puedes volver cuando quieras a registrarte escribiendo START_AGAIN"
+                    "text": "Remember you can go back and setup your account by typing START_AGAIN"
                 };
             }
 
@@ -422,11 +417,11 @@ function analyzeMessage(webhook_event) {
 
                         stored.quick_replies = "";
                         message = {
-                            "text": "¿Ahora dime cuál es tu domicilio de donde solicitas el servicio? Ej. Avenida Siempre Viva con calle 123"
+                            "text": "To improve our matching skills, what year were you born? Ex. 1990"
                         };
                     } else {
                         message = {
-                            "text": "Por favor selecciona una opción"
+                            "text": "Please select an option"
                         };
                     }
                 }
@@ -446,48 +441,9 @@ function analyzeMessage(webhook_event) {
 
                     } else {
                         message = {
-                            "text": "Por favor selecciona una opción"
+                            "text": "Please select an option"
                         };
                     }
-                }
-            }
-
-            // ASK SERVICE
-            if (intent.quick_reply.payload === 'READY') {
-                stored.state = 5;
-                message = {
-                    "text": "¿Qué servicio necesitas solicitar?",
-                    "quick_replies": [
-                        {
-                            "content_type": "text",
-                            "title": "Mensajería",
-                            "payload": "DELIVERY",
-                        },
-                        {
-                            "content_type": "text",
-                            "title": "Aseo",
-                            "payload": "CLEANING",
-                        },
-                        {
-                            "content_type": "text",
-                            "title": "Otro/Especializado",
-                            "payload": "PROFESSIONAL",
-                        },
-                    ]
-                };
-            }
-
-            // SELECT SERVICE
-            if (state === 5) {
-                if (intent.quick_reply.payload === 'DELIVERY' ||
-                    intent.quick_reply.payload === 'CLEANING' ||
-                    intent.quick_reply.payload === 'PROFESSIONAL') {
-                    stored.state = 6;
-                    message = {
-                        "text": "Podrías describirme especificamente los detalles de tu solicitud?"
-                    };
-                } else {
-
                 }
             }
 
@@ -521,43 +477,31 @@ function analyzeMessage(webhook_event) {
                     }
                 }
 
-                // ALWAYS ASK FOR SEARCH TRAVEL PAL IF STATE IS -1 ******
+                // ALWAYS ASK FOR SEARCH TRAVEL PAL IF STATE IS -1
             } else if (state === -1) {
 
-                //searchTravelPal(senderId);
-                createTask();
+                searchTravelPal(senderId);
 
             } else if (state === 0) {
 
-                if (validator.validate(intent.text)) {
-                    stored.user.email = intent.text;
-                    stored.state = 1;
-                    /*message = {
-                     "text": "Nice! What month is the event taking place? Ex. 27th March 2018, 2nd Aug 2019"
-                     };*/
-                    message = {
-                        "text": "Podrías darnos tu número de telefónico? Así puedo contactarte una vez el servicio esté en camino. Ej: 31653949xx"
-                    };
-                } else {
-                    message = {
-                        "text": "Debes darme una dirección de correo válida para poder ayudarte"
-                    };
-                }
+                stored.user.preference = intent.text;
+                stored.state = 1;
+                message = {
+                    "text": "Nice! What month is the event taking place? Ex. 27th March 2018, 2nd Aug 2019"
+                };
 
             } else if (state === 1) {
 
                 // VALIDATE MONTH
-                //if (validateDate(intent) !== false) {
-                if (true) {
-                    //stored.user.date = validateDate(intent);
-                    stored.user.phone = intent.text;
+                if (validateDate(intent) !== false) {
+                    stored.user.when = validateDate(intent);
                     stored.state = 2;
                     message = {
-                        "text": "¿Me podrías decir en que ciudad te encuentras? Ej. Cali-Valle, Bogotá"
+                        "text": "Great! What city is it going to be in? Ex. San Diego, Las Vegas"
                     };
                 } else {
                     message = {
-                        "text": "Por favor escribe un teléfono válido"
+                        "text": "Please type a valid date. Ex. 27th March 2018, 2nd Aug 2019"
                     };
                 }
 
@@ -568,28 +512,29 @@ function analyzeMessage(webhook_event) {
             } else if (state === 4) {
 
                 // VALIDATE YEAR
-                //if (isYearValid(intent.text)) {
-                if (true) {
-                    stored.user.address = intent.text;
-                    stored.state = -1; // AQUI EMPIEZA A PEDIR LA TAREA SIEMPRE
+                if (isYearValid(intent.text)) {
+                    stored.user.birth_year = intent.text;
+                    stored.state = 5;
                     message = {
-                        "text": "Super!, eso es todo, ahora estás listo para solicitar una tarea?"
+                        "text": "Alright! You’re all set, we just need your email to contact you when we find a match! Ex. imawesome@gmail.com"
                     };
-
-                    createTask(senderId);
-                    // SAVE ON MYSQL setFBMuluUser(stored.user);
                 } else {
                     message = {
-                        "text": "Por favor proporciona una dirección de domicilio válida"
+                        "text": "Please type a valid year. Ex: 1986, 1991, ..."
                     };
                 }
 
-            } else if (state === 6) {
+            } else if (state === 5) {
 
-                stored.state = -1;
-                message = {
-                    "text": "Listo! Estamos agendando tu solicitud, en unos minutos podría pedirte mas información"
-                };
+                if (validator.validate(intent.text)) {
+                    stored.state = -1;
+                    stored.user.email = intent.text;
+                    setFBMuluUser(stored.user);
+                } else {
+                    message = {
+                        "text": "Can you please provide a valid email address?"
+                    };
+                }
 
             } else if (state === 11) {
 
@@ -608,7 +553,6 @@ function analyzeMessage(webhook_event) {
         }
 
         // UPDATE STORED SESSION
-        console.log(stored);
         saveSession(stored);
 
         //SEND MESSAGE
@@ -617,6 +561,8 @@ function analyzeMessage(webhook_event) {
         }
 
     });
+
+
 }
 
 function searchTravelPal(senderId) {
@@ -690,17 +636,6 @@ function initUser(senderId) {
 // START SESSION GET MULU SESSION
 function getFBMuluSession(user) {
 
-    client.hgetall("user:" + user.id, function (error, result) {
-        let stored = unflatten(result);
-
-        // ALWAYS START UNLESS
-        stored.state = -2;
-        askQuestions(user);
-        // SAVE CHANGES
-        saveSession(stored);
-    });
-
-
     var options = {
         url: apiUrl + 'travel-pal/chat-session',
         method: 'POST',
@@ -726,7 +661,6 @@ function getFBMuluSession(user) {
                 let stored = unflatten(result);
                 let info = JSON.parse(body);
 
-                // IF EXIST IN MYSQL DATABASE START SEARCHING IF NOT
                 if (info.data.mulu_user_id) {
                     // SEARCH TRAVEL PAL
                     stored.user.mulu_user_id = info.data.mulu_user_id;
@@ -739,7 +673,6 @@ function getFBMuluSession(user) {
                     searchTravelPal(stored.sender_id);
                     getToken(stored.user);
 
-                    // IF NOT DO THIS
                 } else {
                     // REGISTER USER FORM QUESTIONS
                     stored.state = -2; // START FROM SCRATCH STATE
@@ -758,8 +691,7 @@ function getFBMuluSession(user) {
         }
     }
 
-    // UNCOMMENT THIS FOR MYSQL SESSION
-    //request(options, callback);
+    request(options, callback);
 }
 
 function setFBMuluUser(user) {
@@ -814,17 +746,18 @@ function setFBMuluUser(user) {
 }
 
 function pleaseWait(senderId) {
-    sendMessage(senderId, {"text": "Un momento..."});
+    sendMessage(senderId, {"text": "Please wait..."});
 }
 
-function typing(recipientId) {
+// Generic function sending messages
+function sendMessage(recipientId, message) {
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
         qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
         method: 'POST',
         json: {
             recipient: {id: recipientId},
-            sender_action: "typing_on"
+            message: message,
         }
     }, function (error, response, body) {
         if (error) {
@@ -833,29 +766,6 @@ function typing(recipientId) {
             console.log('Error: ', response.body.error);
         }
     });
-}
-
-// Generic function sending messages
-function sendMessage(recipientId, message) {
-    typing(recipientId);
-
-    setTimeout(function() {
-        request({
-            url: 'https://graph.facebook.com/v2.6/me/messages',
-            qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
-            method: 'POST',
-            json: {
-                recipient: {id: recipientId},
-                message: message,
-            }
-        }, function (error, response, body) {
-            if (error) {
-                console.log('Error sending message: ', error);
-            } else if (response.body.error) {
-                console.log('Error: ', response.body.error);
-            }
-        });
-    }, 1000);
 }
 
 // Generic function sending messages
@@ -926,7 +836,7 @@ function googlePlaces(q, session, nextState) {
                 });
 
                 sendMessage(session.sender_id, {
-                    "text": "Por favor selecciona el resultado que mejor concuerda con tu ciudad",
+                    "text": "Please select an option that matches best to you",
                     "quick_replies": quick_replies
                 });
 
@@ -1269,42 +1179,6 @@ function createPlace(user, place) {
     }
 
     request(options, callback);
-}
-
-function createTask(senderId) {
-    let message = {
-        "attachment": {
-            "type": "template",
-            "payload": {
-                "template_type": "button",
-                "text": "Quieres realizar una solicitud? Selecciona NUEVA TAREA 😉. También uedes seleccionar AJUSTES para cambiar tu información.",
-                "buttons": [
-                    {
-                        "type": "web_url",
-                        "url": "https://app.mulutravel.com/travel-pal-profile",
-                        "title": "AJUSTES"
-                    }
-                ]
-            }
-        },
-        "quick_replies": [
-            {
-                "content_type":"text",
-                "title":"NUEVA TAREA",
-                "payload":"READY",
-                // "image_url":"https://s4.aconvert.com/convert/p3r68-cdx67/cb7is-liukh.png"
-            },
-            {
-                "content_type":"text",
-                "title":"TAREAS EN CURSO",
-                "payload":"PENDING"
-            }
-        ]
-    };
-
-    sendMessage(senderId, message);
-
-    //setFBMuluUser(user);
 }
 
 function hsetValue(key, hash, value) {

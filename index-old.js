@@ -102,9 +102,11 @@ app.post('/webhook', (req, res) => {
                 //GETTING STARTED
                 if (webhook_event.postback && webhook_event.postback.payload === 'GETTING_STARTED') {
                     senderId = webhook_event.sender.id;
+                    console.log("here");
                     initUser(senderId);
                 } else {
                     // THERE'S A MESSAGE SENT
+                    console.log("here 2");
                     if (webhook_event.message && webhook_event.message.text) {
                         analyzeMessage(webhook_event);
                     }
