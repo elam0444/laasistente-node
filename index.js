@@ -549,7 +549,7 @@ function analyzeMessage(webhook_event) {
                      "text": "Nice! What month is the event taking place? Ex. 27th March 2018, 2nd Aug 2019"
                      };*/
                     message = {
-                        "text": "Podrías darnos tu número de telefónico? Así puedo contactarte una vez el servicio esté en camino. Ej: 31653949xx"
+                        "text": "Podrías darnos tu número de telefono? Así puedo contactarte una vez el servicio esté en camino. Ej: 31653949xx"
                     };
                 } else {
                     message = {
@@ -566,7 +566,7 @@ function analyzeMessage(webhook_event) {
                     stored.user.phone = intent.text;
                     stored.state = 2;
                     message = {
-                        "text": "¿Me podrías decir en que ciudad te encuentras? Ej. Cali-Valle, Bogotá"
+                        "text": "¿Me podrías decir en que ciudad y departamento te encuentras? Ej. Cali-Valle, Bogotá-Cundinamarca"
                     };
                 } else {
                     message = {
@@ -597,7 +597,7 @@ function analyzeMessage(webhook_event) {
                     };
                 }
 
-            } else if (state === 51) {
+            } else if (state === 51 || state === 60) {
 
                 stored.state = -1;
                 message = {
