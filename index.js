@@ -493,7 +493,7 @@ function analyzeMessage(webhook_event) {
                     intent.quick_reply.payload === 'PROFESSIONAL') {
                     stored.state = 51;
                     message = {
-                        "text": "Podrías describirme especificamente los detalles de tu solicitud?"
+                        "text": "Podrías describirme especificamente los detalles de tu solicitud? ¿Cuándo (fechas disponibles)? ¿Donde (domicilio)? e Información Adicional"
                     };
                 } else {
 
