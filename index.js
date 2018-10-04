@@ -512,9 +512,19 @@ function analyzeMessage(webhook_event) {
 
                 // CHAT READY
             } else if (intent.text.includes("gracias") || intent.text.includes("GRACIAS")) {
+
                 message = {
                     "text": "De nada! :) Para eso estoy para ayudarte!"
                 };
+
+                // REINICIA CUALQUIER ESTADO AL INICIO
+            } else if (intent.text.includes("CANCELAR") || intent.text.includes("TERMINAR_SERVICIO")) {
+
+                stored.state = -1;
+                message = {
+                    "text": "OK! Gracias por usar el servicio, recuerda que estoy para ayudarte"
+                };
+
             } else if (state === -2) {
 
                 if (intent.text.includes('CANCELPAL') ) {
@@ -597,7 +607,7 @@ function analyzeMessage(webhook_event) {
                     };
                 }
 
-            } else if (state === 51 || state === 60) {
+            } else if (state === 51) {
 
                 stored.state = -1;
                 message = {
@@ -609,8 +619,12 @@ function analyzeMessage(webhook_event) {
                 googlePlaces(intent.text, stored, 12);
 
             } else {
-                stored.state = -99;
-                initUser(senderId);
+
+                if (state !== 60) { // ANYTHING DIFFERENT THAN 60: PENDING MODE
+                    stored.state = -99;
+                    initUser(senderId);
+                }
+
             }
 
         }
