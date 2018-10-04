@@ -57,6 +57,7 @@ let user = {
     when: '',
     where_service: '',
     when_service: '',
+    details_service: '',
     place_id: '',
     email: '',
     phone: '',
@@ -632,7 +633,7 @@ function analyzeMessage(webhook_event) {
                     stored.user.where_service = intent;
                     stored.state = 53;
                     message = {
-                        "text": "Eso es todo! Gracias!"
+                        "text": "Ahora puedes describirme los detalles. Ej: Necesito enviar unos documentos a esta dirección, o necesito una persona experta en..."
                     };
                 } else {
                     message = {
@@ -642,6 +643,7 @@ function analyzeMessage(webhook_event) {
 
             } else if (state === 53) {
 
+                stored.user.details_service = intent;
                 stored.state = -1;
                 message = {
                     "text": "Listo! Estamos agendando tu solicitud, en unos minutos podría pedirte mas información"
