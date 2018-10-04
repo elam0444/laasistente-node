@@ -254,12 +254,9 @@ function main(webhook_event) {
 }
 
 function askQuestions(user) {
-    sendMessage(user.id, {
-        "text": "Hola " + user.first_name + "!, yo soy LaAsistente. Me encargaré de ayudarte a resolver cualquier tarea"
-    });
 
     sendMessage(user.id, {
-        "text": "Ej: Enviarte un mensajero para realizar encomiendas, programarte a alguien para asear tu casa/oficina, ayudarte con tu carga laboral, ayudarte a solucionar tu declaración de renta, agendar una cita, enviar un regalo de cumpleaños, o lo que se te ocurra. ",
+        "text": "Hola " + user.first_name + "!, yo soy LaAsistente. Me encargaré de ayudarte a resolver cualquier tarea. Es muy simple selecciona OK! Empecemos. ",
         "quick_replies": [
             {
                 "content_type": "text",
@@ -384,7 +381,7 @@ function analyzeMessage(webhook_event) {
             if (intent.quick_reply.payload === 'START_QUESTIONS') {
                 stored.state = 0;
                 message = {
-                    "text": "¿Cuál es tu email? Ex. hola@correo.com"
+                    "text": "¿Cuál es tu email? Ej. hola@correo.com"
                 };
             }
 
@@ -452,9 +449,9 @@ function analyzeMessage(webhook_event) {
                 }
             }
 
-            // ASK SERVICE
-            if (intent.quick_reply.payload === 'READY') {
-                stored.state = 5;
+            // ASK SIMPLE SERVICE
+            if (intent.quick_reply.payload === 'SIMPLE_TASK') {
+                stored.state = 50;
                 message = {
                     "text": "¿Qué servicio necesitas solicitar?",
                     "quick_replies": [
@@ -477,12 +474,20 @@ function analyzeMessage(webhook_event) {
                 };
             }
 
+            // ASK COMPLEX SERVICE
+            if (intent.quick_reply.payload === 'COMPLEX_TASK') {
+                stored.state = 60;
+                message = {
+                    "text": "Dime en que te puedo ayudar ej: ¿Cuáles son los conciertos de este mes? Necesito ayuda afiliando a alguien a EPS/ARL. ¿Me ayudas con mi declaración de renta? Necesito digitar montones de facturas, o lo que necesites!"
+                };
+            }
+
             // SELECT SERVICE
-            if (state === 5) {
+            if (state === 50) {
                 if (intent.quick_reply.payload === 'DELIVERY' ||
                     intent.quick_reply.payload === 'CLEANING' ||
                     intent.quick_reply.payload === 'PROFESSIONAL') {
-                    stored.state = 6;
+                    stored.state = 51;
                     message = {
                         "text": "Podrías describirme especificamente los detalles de tu solicitud?"
                     };
@@ -502,6 +507,10 @@ function analyzeMessage(webhook_event) {
                 initUser(senderId);
 
                 // CHAT READY
+            } else if (intent.text.includes("gracias") || intent.text.includes("GRACIAS")) {
+                message = {
+                    "text": "De nada! :) Para eso estoy para ayudarte!"
+                };
             } else if (state === -2) {
 
                 if (intent.text.includes('CANCELPAL') ) {
@@ -584,7 +593,7 @@ function analyzeMessage(webhook_event) {
                     };
                 }
 
-            } else if (state === 6) {
+            } else if (state === 51) {
 
                 stored.state = -1;
                 message = {
@@ -1277,12 +1286,12 @@ function createTask(senderId) {
             "type": "template",
             "payload": {
                 "template_type": "button",
-                "text": "Quieres realizar una solicitud? Selecciona NUEVA TAREA 😉. También uedes seleccionar AJUSTES para cambiar tu información.",
+                "text": "Quieres que te ayude con algo? Selecciona SOLICITAR TAREA o TAREA COMPLEJA si necesitas ayuda especializada 😉.",
                 "buttons": [
                     {
                         "type": "web_url",
-                        "url": "https://app.mulutravel.com/travel-pal-profile",
-                        "title": "AJUSTES"
+                        "url": "https://www.laasistente.com/contacto",
+                        "title": "CONTACTO"
                     }
                 ]
             }
@@ -1290,14 +1299,14 @@ function createTask(senderId) {
         "quick_replies": [
             {
                 "content_type":"text",
-                "title":"NUEVA TAREA",
-                "payload":"READY",
+                "title":"SOLICITAR TAREA",
+                "payload":"SIMPLE_TASK",
                 // "image_url":"https://s4.aconvert.com/convert/p3r68-cdx67/cb7is-liukh.png"
             },
             {
                 "content_type":"text",
-                "title":"TAREAS EN CURSO",
-                "payload":"PENDING"
+                "title":"TAREA COMPLEJA",
+                "payload":"COMPLEX_TASK"
             }
         ]
     };
