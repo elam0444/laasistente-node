@@ -489,6 +489,14 @@ function analyzeMessage(webhook_event) {
                 };
             }
 
+            // CANCEL A TASK
+            if (intent.quick_reply.payload === 'CANCEL_TASK') {
+                stored.state = -1;
+                message = {
+                    "text": "OK! Gracias por usar el servicio, siempre estoy aquí cuando me necesites"
+                };
+            }
+
             // SELECT SERVICE
             if (state === 50) {
                 if (intent.quick_reply.payload === 'DELIVERY' ||
@@ -498,8 +506,6 @@ function analyzeMessage(webhook_event) {
                     message = {
                         "text": "Ahora si describeme los detalles de tu solicitud respondiendo las siguientes preguntas. ¿Cuándo necesitas el servicio?"
                     };
-                } else {
-
                 }
             }
 
@@ -1360,6 +1366,11 @@ function createTask(senderId) {
                 "content_type":"text",
                 "title":"TAREA COMPLEJA",
                 "payload":"COMPLEX_TASK"
+            },
+            {
+                "content_type":"text",
+                "title":"CANCELAR",
+                "payload":"CANCEL_TASK"
             }
         ]
     };
