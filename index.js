@@ -54,8 +54,9 @@ let user = {
     attachment_id: '',
     gender: '',
     mulu_user_id: '',
-    where: '',
     when: '',
+    where_service: '',
+    when_service: '',
     place_id: '',
     email: '',
     phone: '',
@@ -610,7 +611,7 @@ function analyzeMessage(webhook_event) {
 
             } else if (state === 51) {
 
-                // VALIDATE MONTH
+                // VALIDATE DATE
                 //if (validateDate(intent) !== false) {
                 if (true) {
                     //stored.user.when = validateDate(intent);
@@ -627,10 +628,7 @@ function analyzeMessage(webhook_event) {
 
             } else if (state === 52) {
 
-                // VALIDATE MONTH
-                //if (validateDate(intent) !== false) {
                 if (true) {
-                    //stored.user.when = validateDate(intent);
                     stored.user.where_service = intent;
                     stored.state = 53;
                     message = {
