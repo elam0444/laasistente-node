@@ -82,20 +82,24 @@ var app = express();
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-app.listen((process.env.PORT || 3000));
-// REMOVE IF //CERTIFICATES HTTPS DOES NOT EXIST
 
 // PUBLIC serves this /public/myfile.ext
 app.use('/public', express.static(__dirname + '/public'));
 
-//CERTIFICATES HTTPS
-/*var fs = require("fs");
-var options = {
-    ca: fs.readFileSync(path.join(__dirname, 'ssl', 'ca_bundle.crt')),
-    key: fs.readFileSync(path.join(__dirname, 'ssl', 'private.key')),
-    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'certificate.crt'))
-};
-https.createServer(options, app).listen((process.env.PORT || 3000));*/
+if (process.env.ENVIRONMENT === 'development') {
+    app.listen((process.env.PORT || 3000));
+}
+
+if (process.env.ENVIRONMENT === 'production') {
+    //CERTIFICATES HTTPS
+    var fs = require("fs");
+    var options = {
+        ca: fs.readFileSync(path.join(__dirname, 'ssl', 'ca_bundle.crt')),
+        key: fs.readFileSync(path.join(__dirname, 'ssl', 'private.key')),
+        cert: fs.readFileSync(path.join(__dirname, 'ssl', 'certificate.crt'))
+    };
+    https.createServer(options, app).listen((process.env.PORT || 3000));
+}
 
 // Server frontpage
 app.get('/', function (req, res) {
