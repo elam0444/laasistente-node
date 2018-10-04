@@ -55,6 +55,7 @@ let user = {
     gender: '',
     mulu_user_id: '',
     where: '',
+    when: '',
     place_id: '',
     email: '',
     phone: '',
@@ -493,7 +494,7 @@ function analyzeMessage(webhook_event) {
                     intent.quick_reply.payload === 'PROFESSIONAL') {
                     stored.state = 51;
                     message = {
-                        "text": "Podrías describirme especificamente los detalles de tu solicitud? ¿Cuándo (fechas disponibles)? ¿Donde (domicilio)? e Información Adicional"
+                        "text": "Ahora si describeme los detalles de tu solicitud respondiendo las siguientes preguntas. ¿Cuándo necesitas el servicio?"
                     };
                 } else {
 
@@ -608,6 +609,40 @@ function analyzeMessage(webhook_event) {
                 }
 
             } else if (state === 51) {
+
+                // VALIDATE MONTH
+                //if (validateDate(intent) !== false) {
+                if (true) {
+                    //stored.user.when = validateDate(intent);
+                    stored.user.when_service = intent;
+                    stored.state = 52;
+                    message = {
+                        "text": "Super! Ya lo anoté! Ahora dime donde necesitas el servicio. Ej: Avenida 123 con calle falsa 4"
+                    };
+                } else {
+                    message = {
+                        "text": "Por favor escribe una fecha que yo pueda entender"
+                    };
+                }
+
+            } else if (state === 52) {
+
+                // VALIDATE MONTH
+                //if (validateDate(intent) !== false) {
+                if (true) {
+                    //stored.user.when = validateDate(intent);
+                    stored.user.where_service = intent;
+                    stored.state = 53;
+                    message = {
+                        "text": "Eso es todo! Gracias!"
+                    };
+                } else {
+                    message = {
+                        "text": "Por favor dame una dirección válida"
+                    };
+                }
+
+            } else if (state === 53) {
 
                 stored.state = -1;
                 message = {
