@@ -616,7 +616,7 @@ function analyzeMessage(webhook_event) {
                 //if (validateDate(intent) !== false) {
                 if (true) {
                     //stored.user.when = validateDate(intent);
-                    stored.user.when_service = intent;
+                    stored.user.when_service = intent.text;
                     stored.state = 52;
                     message = {
                         "text": "Super! Ya lo anoté! Ahora dime donde necesitas el servicio. Ej: Avenida 123 con calle falsa 4"
@@ -630,7 +630,7 @@ function analyzeMessage(webhook_event) {
             } else if (state === 52) {
 
                 if (true) {
-                    stored.user.where_service = intent;
+                    stored.user.where_service = intent.text;
                     stored.state = 53;
                     message = {
                         "text": "Ahora puedes describirme los detalles. Ej: Necesito enviar unos documentos a esta dirección, o necesito una persona experta en..."
@@ -643,7 +643,7 @@ function analyzeMessage(webhook_event) {
 
             } else if (state === 53) {
 
-                stored.user.details_service = intent;
+                stored.user.details_service = intent.text;
                 stored.state = -1;
                 message = {
                     "text": "Listo! Estamos agendando tu solicitud, en unos minutos podría pedirte mas información"
