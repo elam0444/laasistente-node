@@ -70,6 +70,7 @@ let session = {
     sender_id: "",
     match_sender_id: "",
     state: -99,
+    timestamp: "",
     quick_replies: "",
     guide_id: 0,
     selected_place: "", // FOR CREATING GUIDES
@@ -381,6 +382,7 @@ function analyzeMessage(webhook_event) {
         let senderId = webhook_event.sender.id;
         let intent = webhook_event.message;
         let state = Number(stored.state);
+        stored.timestamp = webhook_event.timestamp;
         let message;
 
         // QUICK REPLIES
@@ -523,11 +525,11 @@ function analyzeMessage(webhook_event) {
             } else if (intent.text.includes("gracias") || intent.text.includes("GRACIAS")) {
 
                 message = {
-                    "text": "De nada! :) Para eso estoy para ayudarte!"
+                    "text": "De nada! :) Para eso estoy, para colaborarte!"
                 };
 
                 // REINICIA CUALQUIER ESTADO AL INICIO
-            } else if (intent.text.includes("CANCELAR") || intent.text.includes("TERMINAR_SERVICIO")) {
+            } else if (intent.text.includes("CANCELAR") || intent.text.includes("TERMINAR_TAREA")) {
 
                 stored.state = -1;
                 message = {
@@ -676,7 +678,7 @@ function analyzeMessage(webhook_event) {
         }
 
         // UPDATE STORED SESSION
-        console.log(stored);
+        //console.log(stored);
         saveSession(stored);
 
         //SEND MESSAGE
@@ -979,8 +981,8 @@ function googlePlaces(q, session, nextState) {
     if (q !== '') {
         googleMapsClient.placesAutoComplete({
             input: q,
-            language: 'en',
-            //location: [40.724, -74.013],
+            language: 'es',
+            location: [4.5709, -74.2973],
             //radius: 5000,
             //components: {country: 'us'}
         }).asPromise()
@@ -1386,6 +1388,34 @@ function hsetValue(key, hash, value) {
     });
 }
 
+// TIMEOUT TO CHECK RESPONSE AFTER 5 MINUTES
+let myVar;
+function waitForResponse() {
+    myVar = setTimeout(function(){
+        alert("Hello");
+        }, 300000);
+}
+
+function stopWaitForResponse() {
+    clearTimeout(myVar);
+}
+
+function cancelTask(senderId) {
+    let message = {
+        "text": "Hay algo más en lo que te pueda ayudar?",
+        "quick_replies": [
+            {
+                "content_type": "text",
+                "title": "ESO ES TODO GRACIAS!",
+                "payload": "CANCEL_TASK",
+            }
+        ]
+    };
+
+    sendMessage(senderId, message);
+}
+// TIMEOUT TO CHECK RESPONSE
+
 function saveSession(session) {
     let redisKey = "user:" + session.sender_id;
     let flatSession = flatten(session);
@@ -1405,6 +1435,18 @@ function initCronJobs() {
 
                 client.hgetall(keys[i], function (error, result) {
                     let stored = unflatten(result);
+
+                    // HAVE PASSED 5 MIN
+                    let minutes_from_timestamp = parseInt(stored.timestamp) + 300000;
+                    let current = new Date().getTime();
+
+                    // IF HAVE PASSED MINUTES AND IS COMPLEX TASK CHATING = 60
+                    if (minutes_from_timestamp <= current && Number(stored.state) === 60) {
+                        console.log(stored.sender_id);
+                        cancelTask(stored.sender_id);
+                    } else {
+                        //console.log("not yet")
+                    }
 
                     if (!stored.match_sender_id) {
                         getActiveFriend(stored);
